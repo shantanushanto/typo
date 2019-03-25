@@ -62,5 +62,12 @@ describe Admin::CategoriesController do
 
     assert_raise(ActiveRecord::RecordNotFound) { Category.find(test_id) }
   end
+
+  it "test properly working edit button when adding a category name" do
+    sample_name = Factory(:category).name #Create test name 
+    get :edit, :category => {:name => sample_name} # Edit category with test name
+
+    assert_response :success
+  end 
   
 end

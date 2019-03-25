@@ -25,7 +25,12 @@ class Admin::CategoriesController < Admin::BaseController
 
   def new_or_edit
     @categories = Category.find(:all)
-    @category = Category.find(params[:id])
+    # bug fix 1. Doesn't break if the params[:id] is nil
+    if params[:id].nil?
+      @category = Category.new
+    else
+      @category = Category.find(params[:id])
+    end
     @category.attributes = params[:category]
     if request.post?
       respond_to do |format|
@@ -43,9 +48,14 @@ class Admin::CategoriesController < Admin::BaseController
   end
 
   def save_category
-    if @category.save!
+    # bug fix 2.
+    # There was also the issue when it came to saving a category on the site
+    # The problem was with the code in this function that made incorrect
+    # calls to certain functions causing syntax errors.
+    if !(@category.save)
       flash[:notice] = _('Category was successfully saved.')
     else
+      @category.save!
       flash[:error] = _('Category could not be saved.')
     end
     redirect_to :action => 'new'
